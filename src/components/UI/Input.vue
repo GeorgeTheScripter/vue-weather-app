@@ -3,7 +3,7 @@
     type="text"
     :value="modelValue"
     @input="updateInput"
-    class="px-4 py-2 outline-none border-1 border-solid rounded-md"
+    class="px-4 py-2 outline-none border-1 border-solid border-sky-600 rounded-[12px]"
   />
 </template>
 

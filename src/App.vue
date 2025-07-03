@@ -1,8 +1,20 @@
 <template>
-  <div>
-    <Form @update="handleSubmit" />
+  <div class="py-[20px] px-[16px]">
+    <div class="flex flex-col gap-[24px]">
+      <Form @update="handleSubmit" />
+      <div v-if="!weatherStore.weather">Нет инфы</div>
+      <MainCityCard v-else :info="weatherStore.weatherinfo" />
+    </div>
 
-    <MainCityCard :weatherStore="weatherStore" :title="title" />
+    <div v-if="weatherStore.favorites.length > 0" class="mt-10">
+      <h3 class="text-[32px] font-medium text-sky-600">Сохраненные</h3>
+
+      <MainCityCard
+        v-for="city in weatherStore.favorites"
+        :key="city.id"
+        :info="city"
+      />
+    </div>
   </div>
 </template>
 
@@ -18,14 +30,13 @@ export default {
   },
   data() {
     return {
-      title: "",
       weatherStore: useWeatherStore(),
     };
   },
   methods: {
     handleSubmit(cityName) {
       if (!cityName.trim()) return;
-      this.weatherStore.getWeather(cityName);
+      this.weatherStore.fetchWeather(cityName);
       this.title = cityName;
     },
   },

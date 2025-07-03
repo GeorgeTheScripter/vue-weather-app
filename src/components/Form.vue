@@ -1,7 +1,7 @@
 <template>
-  <form @submit.prevent="$emit('update', cityName)" class="flex gap-2">
-    <Input v-model="cityName" />
-    <Button>search</Button>
+  <form @submit.prevent="handleUpdate" class="flex gap-2">
+    <Input class="w-full" v-model="cityName" />
+    <Button>Поиск</Button>
   </form>
 </template>
 
@@ -11,6 +11,12 @@ export default {
     return {
       cityName: "",
     };
+  },
+  methods: {
+    handleUpdate() {
+      this.$emit("update", this.cityName);
+      this.cityName = "";
+    },
   },
 };
 </script>
