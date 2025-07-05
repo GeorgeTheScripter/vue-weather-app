@@ -4,48 +4,52 @@ import { getLocalTime } from "../utils/helpers";
 
 export const useWeatherStore = defineStore("weatherStore", {
   state: () => ({
-    isLoading: false,
-    weather: null,
-    error: null,
+    city: null,
     favorites: [],
+    isLoading: false,
+    error: null,
   }),
 
   getters: {
-    weatherinfo() {
-      if (!this.weather) return null;
-      console.log(this.weather.name);
+    cityWeather() {
+      if (!this.city) return {};
       return {
-        id: this.weather.id,
-        city: this.weather.name,
-        country: this.weather.sys.country,
-        temp: Math.ceil(this.weather.main.temp - 273.15),
-        feelsLike: Math.ceil(this.weather.main.feels_like - 273.15),
-        humidity: this.weather.main.humidity,
-        pressure: this.weather.main.pressure,
-        description: this.weather.weather[0].description,
-        icon: this.weather.weather[0]?.icon,
-        time: getLocalTime(this.weather.timezone),
-        wind: this.weather.wind.speed,
+        id: this.city.id,
+        name: this.city.name,
+        country: this.city.sys.country,
+        time: getLocalTime(this.city.timezone),
+        description: this.city.weather[0].description,
+        temp: Math.ceil(this.city.main.temp - 273.15),
+        feel: Math.ceil(this.city.main.feels_like - 273.15),
+        wind: Math.ceil(this.city.wind.speed),
+        humidity: this.city.main.humidity,
+        pressure: this.city.main.pressure,
       };
     },
   },
 
   actions: {
-    async fetchWeather(city) {
+    async fetchWeather(cityName) {
       try {
         this.isLoading = true;
-        this.weather = await fetchData(city);
-        this.city = this.weather.name;
+        this.city = await fetchData(cityName);
       } catch (error) {
-        this.error = error.message || "Ошибка загрузки данных";
-        console.log(error);
+        this.error = error.message || "error";
       } finally {
         this.isLoading = false;
       }
     },
-    addToFavorites(city) {
-      console.log(city);
-      this.favorites.push(city);
+
+    addFavorite(city) {
+      if (!this.favorites.some((item) => item.id === city.id)) {
+        this.favorites.push({ ...city, isFavorite: true });
+      } else {
+        alert("Город уже добавлен");
+      }
+    },
+
+    removeFavorite(id) {
+      this.favorites = this.favorites.filter((city) => city.id !== id);
     },
   },
 });

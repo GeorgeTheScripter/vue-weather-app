@@ -1,44 +1,38 @@
 <template>
-  <div class="py-[20px] px-[16px]">
-    <div class="flex flex-col gap-[24px]">
-      <Form @update="handleSubmit" />
-      <div v-if="!weatherStore.weather">Нет инфы</div>
-      <MainCityCard v-else :info="weatherStore.weatherinfo" />
-    </div>
+  <div class="py-[20px]">
+    <div class="max-w-xl mx-auto flex flex-col gap-2">
+      <form @submit.prevent="handleWeather" class="flex gap-1 w-full px-[12px]">
+        <input
+          class="border border-sky-700 rounded-[12px] p-[12px] w-full"
+          v-model="cityName"
+          type="text"
+        />
+        <button class="bg-sky-700 p-[12px] rounded-[12px] text-white">
+          <img src="./assets/icons/search.svg" alt="" />
+        </button>
+      </form>
 
-    <div v-if="weatherStore.favorites.length > 0" class="mt-10">
-      <h3 class="text-[32px] font-medium text-sky-600">Сохраненные</h3>
+      <div class="px-[12px]">
+        <WeatherCard v-if="weatherStore.city" :city="city" />
+      </div>
 
-      <MainCityCard
-        v-for="city in weatherStore.favorites"
-        :key="city.id"
-        :info="city"
-      />
+      <WeatherFavoriteList />
     </div>
   </div>
 </template>
 
-<script>
-import { useWeatherStore } from "./stores/WeatherStore.js";
-import MainCityCard from "./components/MainCityCard.vue";
-import Form from "./components/Form.vue";
+<script setup>
+import { ref, computed } from "vue";
+import { useWeatherStore } from "./stores/weatherStore";
+import WeatherCard from "./components/WeatherCard.vue";
+import WeatherFavoriteList from "./components/WeatherFavoriteList.vue";
 
-export default {
-  components: {
-    MainCityCard,
-    Form,
-  },
-  data() {
-    return {
-      weatherStore: useWeatherStore(),
-    };
-  },
-  methods: {
-    handleSubmit(cityName) {
-      if (!cityName.trim()) return;
-      this.weatherStore.fetchWeather(cityName);
-      this.title = cityName;
-    },
-  },
+const cityName = ref("");
+const weatherStore = useWeatherStore();
+const city = computed(() => weatherStore.cityWeather);
+
+const handleWeather = async () => {
+  await weatherStore.fetchWeather(cityName.value.trim());
+  cityName.value = "";
 };
 </script>
